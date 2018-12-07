@@ -1,6 +1,4 @@
-## Writeup Template
-
-### You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
+## Writeup 
 
 ---
 
@@ -19,13 +17,14 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./outtput_images/distortion_correction/out10.jpg "Undistorted"
-[image2]: .output_images/corrected_test_images/corrected_1.jpg "Road Transformed"
-[image3]: .output_images/thresholded_images/thresholded_1.jpg "Binary Example"
-[image4]: ./examples/warped_straight_lines.jpg "Warp Example"
-[image5]: ./examples/color_fit_lines.jpg "Fit Visual"
-[image6]: ./examples/example_output.jpg "Output"
-[video1]: ./project_video.mp4 "Video"
+[image1]: ./output_images/distortion_correction/out10.jpg "Undistorted"
+[image2]: ./output_images/corrected_test_images/corrected_1.jpg "Road Transformed"
+[image3]: ./output_images/thresholded_images/thresholded_1.jpg "Binary Example"
+[image4]: ./output_images/warped/warped_3.jpg "Warp Example"
+[image5]: ./output_images/lane_detection/detected_1.jpg "Fit Visual"
+[image6]: ./output_images/final_output/final_1.jpg "Output"
+[video1]: ./test_videos_output/project_video.mp4 "ProjectVideo"
+[video2]: ./test_videos_output/challenge_video.mp4 "ChallengeVideo"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
 
@@ -33,11 +32,7 @@ The goals / steps of this project are the following:
 
 ---
 
-### Writeup / README
 
-#### 1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  [Here](https://github.com/udacity/CarND-Advanced-Lane-Lines/blob/master/writeup_template.md) is a template writeup for this project you can use as a guide and a starting point.  
-
-You're reading it!
 
 ### Camera Calibration
 
@@ -77,37 +72,58 @@ All the threholded test image output is located in the folder *output_images/thr
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform includes a function called `perspective_transform()`, which appears  the 8th code cell of the IPython notebook.  The `perspective_transform()` function takes as input an binary thresholded image (`thrs_image`). I chose the hardcode the source and destination points in the following manner:
+The code for my perspective transform includes a function called `perspective_transform()`, which appears  the 8th code cell of the IPython notebook.  The `perspective_transform()` function takes as input an  image (`thrs_image`). I chose the hardcode the source and destination points in the following manner:
 
-```python
-
-    tl = [sh[1]*0.4,sh[0]*0.65]
-    tr = [sh[1]*0.6,sh[0]*0.65]
-    bl = [sh[1]*0.1,sh[0]]
-    br = [sh[1],sh[0]]
-
-    src = np.float32([tl,tr,br,bl])
-    dst = np.float32([[200,0],[1000,100],[1000,680],[200,680]])
 ```
 
+     bl = [220,720]
+    br = [1110, 720]
+    tl = [570, 470]
+    tr = [722, 470]
 
-I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto  test images and its warped counterpart to verify that the lines appear parallel in the warped image.
+    src = np.float32([tl,tr,br,bl])
+    dst = np.float32([[320,0],[920,0],[920,720],[320,720]])
+```
+
+Apart from the warped image the function also outputs the tranformation and inverse transformation matrix.
+I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto  test images and its warped counterpart to verify that the lines appear almost parallel in the warped image. The output is located in the folder *output_images/warped/*. An example is given below:
 
 ![alt text][image4]
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+Three functions are used identifying  the lane-line pixels and fit their positions with a polynomial
+
+* `sliding_window():` The code for the function can be found in the  code cell no. 10. This function is called to search the perpective transfomred thresholded image from the scratch for lane-line pixels. An histogram is obtained from the input thresholded bird's eye view of the image. The position of peaks in the histogram gives the indication of the base of the respectice lane pixels. Starting from that base position, an window of known height and width is slided, shifting up and also changing its center depending on the number of  of nonzero pixels identified in the image. The width of window used is 100 and number of windows used to cover the height of the entire image 9. 
+
+The x and y cordinates of non zero lane pixels are found and a polynomial is fitted through it.
+
+* `search_around_poly():` The code for the function can be found in the  code cell no. 11. Once an polynomial is fitted in previous frame of the video, searching from the scratch for lan-line pixels in the current frame is inefficeient. So, a focussed search is carried out with in a margin (in present case margin of 50)  of the polynomial identified in the previous frame to identify the laneline pixels in the currrent frame. If the identified lane pixels passes thte sanity check of having absolute difference in their curvature less than 2 and having almost same slope the lines are kept or they are discarded.
+
+* `fit_poly():` The code for the function can be found in the code cell no. 10. The function is used to fit a polynomial over detected lane-line pixels.
+
+
+Output on test images is located in the folder *ouput_images/lane_detection*.An Example where lanes are identified is :
 
 ![alt text][image5]
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-I did this in lines # through # in my code in `my_other_file.py`
+The function for computing the radius of curvature is defined in *Line* class itself defined in code cell no. 2. The function computes the radius of curvature in meters. The radius of curvature is calculated using the formula discussed in class.
+The vehicle offset is calculated as the difference between the center of the image and center of the lane converted to meters. the code is located in cell 13.
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+The main pipeline is a function named `detect_lanes().` The pipeline has following steps:
+
+* Undistort the input image
+* Use function `image_thresholding()` to obtained a binary thresholded image.
+* Get a bird's eye view of the thresholded image using the function `perspective_transform()`
+* If lane lines were detected in the previous frame of the video use the function `search_around_poly()` to perform a focussed search. If the fucntion fails to detect new lane-line pixels or detected lan-lines does not pass the sanity check based on radius of curvature and slope the frame is dropped.
+* If no lane lines were detected in the previous frame, new lane lines are detected from scratch using the function `sliding_window()`. If the function fails to detect any new lane line pixels the frame is dropped.
+* The detected lane area is covered with polygon on the warped image. An inverse perspective transform is performed and the resultant image is combined with the original image. While drawing the polygon, average value of the lane-line pixels are used. (avereged over last 30 frames)
+
+The final output for all the test images is in the folder *output_images/final_output*. One example image is shown here:
 
 ![alt text][image6]
 
@@ -117,7 +133,9 @@ I implemented this step in lines # through # in my code in `yet_another_file.py`
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my video result][video1]
+
+Here's is the link to challenge video [link to challenge video][video2]
 
 ---
 
@@ -125,4 +143,7 @@ Here's a [link to my video result](./project_video.mp4)
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+* Needed to experiment with various threshold value for gradient and direction based thresholds.
+* Obtaining a proper perspective transform was challenging, needed to experiment with various values.
+* The pipeline does very well for the project video, but it does average on the challenge video. The darker running line on the road along the lane gets detected as lane line which causes issues. Also there is section in the video where the car passes under a bridge, its very dark there and no lane lines are detected,specially left lane line pixels remains undetected. Better perpective transform and thresholding can solve the issue.
+* The pipeline fails if there is a sharp turn in the video. Sliding window algorithm can be improved upon when the lane lines goes off the image and window reaches on left or right edge of the image. Also, averaging over less number of frames may also improve the results. 
