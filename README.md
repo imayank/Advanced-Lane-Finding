@@ -5,7 +5,7 @@
 
 Overview
 -----
-The project builds on the [basic lane line detection](https://github.com/imayank/Finding-Lane-Lines-on-the-Road) and a more advanced pipeline is developed to identify the lane boundry and region in a video of a car driving on a highway. 
+The project builds on the [basic lane line detection](https://github.com/imayank/Finding-Lane-Lines-on-the-Road) and a more advanced pipeline is developed to identify the lane boundry and region in a video of a car driving on a highway. The project uses *Python* and *OpenCV* for building lane detection pipeline.
 
 The Project
 ---
