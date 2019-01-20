@@ -1,39 +1,40 @@
 ## Advanced Lane Finding
 [![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
 
+![Detected Region](./output_images/final_output/final_5.jpg)
 
-In this project, your goal is to write a software pipeline to identify the lane boundaries in a video, but the main output or product we want you to create is a detailed writeup of the project.  Check out the [writeup template](https://github.com/udacity/CarND-Advanced-Lane-Lines/blob/master/writeup_template.md) for this project and use it as a starting point for creating your own writeup.  
-
-Creating a great writeup:
----
-A great writeup should include the rubric points as well as your description of how you addressed each point.  You should include a detailed description of the code used in each step (with line-number references and code snippets where necessary), and links to other supporting documents or external references.  You should include images in your writeup to demonstrate how your code works with examples.  
-
-All that said, please be concise!  We're not looking for you to write a book here, just a brief description of how you passed each rubric point, and references to the relevant code :). 
-
-You're not required to use markdown for your writeup.  If you use another method please just submit a pdf of your writeup.
+Overview
+-----
+The project builds on the [basic lane line detection](https://github.com/imayank/Finding-Lane-Lines-on-the-Road) and a more advanced pipeline is developed to identify the lane boundry and region in a video of a car driving on a highway. 
 
 The Project
 ---
-
 The goals / steps of this project are the following:
 
-* Compute the camera calibration matrix and distortion coefficients given a set of chessboard images.
-* Apply a distortion correction to raw images.
-* Use color transforms, gradients, etc., to create a thresholded binary image.
-* Apply a perspective transform to rectify binary image ("birds-eye view").
-* Detect lane pixels and fit to find the lane boundary.
-* Determine the curvature of the lane and vehicle position with respect to center.
-* Warp the detected lane boundaries back onto the original image.
+* Computing distortion coefficients and calibration matrix for the camera.
+* Distortion correcting the raw images using the parameters obtained above.
+* Use gradient and color transform to obtained a thresholded binary image.
+* Perpective transformation of the binary image to obtain a bird's eye view.
+* Detecting the pixels that belong to lane marings.
+* Computing radius of curvature and offset of the vehicle from lane center (the camera is mounted at center of the vehicle).
 * Output visual display of the lane boundaries and numerical estimation of lane curvature and vehicle position.
 
-The images for camera calibration are stored in the folder called `camera_cal`.  The images in `test_images` are for testing your pipeline on single frames.  If you want to extract more test images from the videos, you can simply use an image writing method like `cv2.imwrite()`, i.e., you can read the video in frame by frame as usual, and for frames you want to save for later you can write to an image file.  
+Directory Structure
+---
 
-To help the reviewer examine your work, please save examples of the output from each stage of your pipeline in the folder called `output_images`, and include a description in your writeup for the project of what each image shows.    The video called `project_video.mp4` is the video your pipeline should work well on.  
+* `camera_cal` stores images for calibrating the camera.
+* `test_images` folder contains snapshots from the video for testing the lane detection pipeline at various stages.
+* `challenge_video_snapshots` contains image snaps from the challenge video that were used to test the pipeline on challenge video images.
+* `test_images_output` contains the lane detection pipeine outputs from various stages on the images contained in `test_images`
+* `project_video` is the main project video on which the pipeline must work, `challenge_video` and `harder_challenge_video` are optional videos to test pipelines.
+* `cameraCalibration.ipynb` contains the code for determining the camera calibration matrix and distortion coefficients.
+* `DetectingLaneLines.ipynb` contains all the code for the lane detection pipeline except for camera calibration.
+* `writeup.md` is a writeup explaining various stages of the pipeline. **Great place for understanding the project**
 
-The `challenge_video.mp4` video is an extra (and optional) challenge for you if you want to test your pipeline under somewhat trickier conditions.  The `harder_challenge.mp4` video is another optional challenge and is brutal!
-
-If you're feeling ambitious (again, totally optional though), don't stop there!  We encourage you to go out and take video of your own, calibrate your camera and show us how you would implement this project from scratch!
-
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
-
+Dependecies
+---
+* numPy
+* matplotlib
+* cv2
+* moviepy
+* Jupyter Ipython notebook
